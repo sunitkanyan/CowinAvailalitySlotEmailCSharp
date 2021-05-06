@@ -1,3 +1,3 @@
 # CowinAvailalitySlotEmailCSharp
 
-can enhance it as per your requirement - it iw very basic.
+can enhance it as per your requirement - it is very basic one
