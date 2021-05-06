@@ -1,0 +1,5 @@
+/console app/bin/Debug/net5.0/*.dll
+/console app/bin/Debug/net5.0/*.exe
+/console app/bin/Debug/net5.0
+/console app/obj/Debug/net5.0
+/console app/obj
