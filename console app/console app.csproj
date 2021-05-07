@@ -10,6 +10,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="RestClient" Version="3.446.20952" />
     <PackageReference Include="RestSharp" Version="106.11.7" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

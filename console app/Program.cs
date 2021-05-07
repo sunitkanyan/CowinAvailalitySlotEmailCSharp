@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -21,40 +21,49 @@ namespace console_app
             {
 
                 InvokeAPI();
-                Thread.Sleep(60000*60); // run every 1 hour
-
+                Thread.Sleep(60000*30); // run every 30 min
 
             }
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("end");
         }
 
         private static void InvokeAPI()
         {
             try
             {
-
-                var client = new RestClient("https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode=122001&date=07-05-2021");
+                Console.WriteLine("running.............");
+               //cahneg pin and date in url
+               // make sure date should be a day next alteast
+                var client = new RestClient("https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode=122001&date=08-05-2021");
                 client.Timeout = -1;
                 var request = new RestRequest(Method.GET);
                 client.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.51";
                 request.AddParameter("text/plain", "", ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
-                Console.WriteLine(response.Content);
+               // Console.WriteLine(response.Content);
                 VaccinedSlots vaccinedSlots = JsonConvert.DeserializeObject<VaccinedSlots>(response.Content);
                 if (vaccinedSlots != null)
                 {
                     if (vaccinedSlots.Centers.Count > 0)
                     {
-                      var ce=  vaccinedSlots.Centers.Find(c => c.Address.Contains("patel")); //your nearby hospitl name
-                        if(ce != null)
+                  //      var ce = vaccinedSlots.Centers;
+                   var ce =  vaccinedSlots.Centers.FindAll(l => l.Address.Contains("Patel Nagar")); //your nearby hospitl name ste name
+                        if (ce != null)
                               {
-                            foreach (Session ss in ce.Sessions)
+                            foreach (Center c in ce)
                             {
-                                if (ss.AvailableCapacity > 0)
-                                {//suite email
-                                 //
-                                    Email();
-                                    goto  exitnow;
+                                foreach (Session ss in c.Sessions)
+                                {
+                                    if (ss.MinAgeLimit == 18)
+                                    {
+                                        if (ss.AvailableCapacity > 0)
+                                        {//suite email
+                                         //
+                                            Console.WriteLine("\n slot mill gya");
+                                            Email();
+                                            goto exitnow;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -66,30 +75,36 @@ namespace console_app
             {
 
             }
-            exitnow: Console.WriteLine("slot found");
+            exitnow: Console.WriteLine("...runing");
         }
 
         private static void Email()
         {
             try
             {
-                MailMessage message = new MailMessage();
-                SmtpClient smtp = new SmtpClient();
-                message.From = new MailAddress("*****@gmail.com");
-                message.To.Add(new MailAddress("*****@gmail.com"));
-                message.Subject = "book apt right way";
-                message.IsBodyHtml = true; //to make message body as html  
-                message.Body = "book now please";
-                smtp.Port = 587;
-                smtp.Host = "smtp.gmail.com"; //for gmail host  
-                smtp.EnableSsl = true;
-                smtp.UseDefaultCredentials = true;
+                using (MailMessage mail = new MailMessage())
+                {
+                    mail.From = new MailAddress("abcgmail.com");
+                    mail.To.Add("****@gmail.com");
+                    mail.Subject = "books lot now available";
+                    mail.Body = "<h1>book now</h1>";
+                    mail.IsBodyHtml = true;
+                  
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        smtp.UseDefaultCredentials = false;
+                        smtp.Credentials = new NetworkCredential("abcgmail.com", "123456");
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
+                    }
+                }
 
-                smtp.Credentials = new NetworkCredential("*********@gmail.com", "********");
-                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtp.Send(message);
+                Console.WriteLine("\nemail sent \n");
             }
-            catch (Exception ex) { }
+            catch (Exception ex) {
+
+                Console.WriteLine("\nemail error \n");
+            }
         }
     }
   
